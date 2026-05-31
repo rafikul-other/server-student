@@ -1,71 +1,33 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import dbConnection from "./utils/dbConnection.js";
-import {
-  AdminLogin,
-  StudentLogin,
-  StudentRegister,
-  SuperAdminLogin,
-} from "./utils/auth/auth.js";
-import {
-  studentAttendence,
-  studentAttendenceUpdate,
-  studentDelete,
-  studentFetch,
-  studentSingleFetch,
-  studentUpdateAboutMe,
-} from "./controllers/students/students.js";
+import dbConnection from "./config/dbConnection.js";
+import authRoutes from "./routes/authRoutes.js";
+import studentRoutes from "./routes/studentRoutes.js";
+import attendanceRoutes from "./routes/attendanceRoutes.js";
+import departmentManagerRoutes from "./routes/departmentManagerRoutes.js";
+import { errorHandler, notFoundHandler } from "./middleware/errorHandler.js";
 
-const app = express();
-
-//? variables extracted from env file
-const PORT = process.env.PORT || 5000;
-
-//? env configuration
 dotenv.config();
 
-//? middlewares
+const app = express();
+const PORT = process.env.PORT || 5000;
+
 app.use(express.json());
 app.use(cors("*"));
 
-//? routes
 app.get("/", (req, res) => {
-  res.status(200).json({ message: "API is running!" });
+  res.status(200).json({ message: "GD College API is running!", version: "2.0" });
 });
 
-//? connect to MongoDB
-dbConnection();
+app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/students", studentRoutes);
+app.use("/api/v1/attendance", attendanceRoutes);
+app.use("/api/v1/department-managers", departmentManagerRoutes);
 
-//? superadmin login auth
-app.post("/api/v1/superadmin/login", SuperAdminLogin);
+app.use(notFoundHandler);
+app.use(errorHandler);
 
-//? admin login auth
-app.post("/api/v1/admin/login", AdminLogin);
-
-//? student registration
-app.post("/api/v1/students/register", StudentRegister);
-
-//? student login auth
-app.post("/api/v1/students/login", StudentLogin);
-
-//? student fetching from database
-app.get("/api/v1/students/fetch", studentFetch);
-
-//? Single / Particular student fetching from database
-app.get("/api/v1/students/fetchSingle/:id", studentSingleFetch);
-
-//? Update Student Attendence related Main api's
-app.post("/api/v1/students/attendence", studentAttendence);
-
-//? Delete students from database
-app.delete("/api/v1/students/delete", studentDelete);
-
-//? update student specific attendace by Admin
-app.put("/api/v1/students/updateAttendance/:id", studentAttendenceUpdate);
-
-//? Update student About Me
-app.put("/api/v1/students/updateAboutMe/:id", studentUpdateAboutMe);
-
-//? server listening
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+dbConnection().then(() => {
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+});
