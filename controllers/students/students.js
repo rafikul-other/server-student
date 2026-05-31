@@ -62,7 +62,7 @@ const studentFetch = async (req, res) => {
     });
 
     res.status(200).json({
-      message: "Students Fetch Successfully",
+      message: "Students Loaded Successfully",
       success: true,
       data: studentsWithAttendanceStats,
       totalStudents: students.length,
@@ -249,10 +249,47 @@ const studentAttendenceUpdate = async (req, res) => {
   }
 };
 
+const studentUpdateAboutMe = async (req, res) => {
+  const { id } = req.params;
+  const { aboutMe } = req.body;
+
+  if (aboutMe === undefined) {
+    return res.status(400).json({
+      message: "aboutMe field is required",
+      success: false,
+    });
+  }
+
+  try {
+    const updatedStudent = await StudentModel.findByIdAndUpdate(
+      id,
+      { aboutMe },
+      { new: true }
+    );
+
+    if (!updatedStudent) {
+      return res.status(404).json({
+        message: "Student not found",
+        success: false,
+      });
+    }
+
+    res.status(200).json({
+      message: "About Me updated successfully",
+      success: true,
+      data: updatedStudent,
+    });
+  } catch (error) {
+    console.error("Error updating aboutMe:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 export {
   studentFetch,
   studentAttendence,
   studentDelete,
   studentSingleFetch,
   studentAttendenceUpdate,
+  studentUpdateAboutMe,
 };

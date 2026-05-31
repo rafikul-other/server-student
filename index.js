@@ -14,6 +14,7 @@ import {
   studentDelete,
   studentFetch,
   studentSingleFetch,
+  studentUpdateAboutMe,
 } from "./controllers/students/students.js";
 
 const app = express();
@@ -62,6 +63,9 @@ app.delete("/api/v1/students/delete", studentDelete);
 
 //? update student specific attendace by Admin
 app.put("/api/v1/students/updateAttendance/:id", studentAttendenceUpdate);
+
+//? Update student About Me
+app.put("/api/v1/students/updateAboutMe/:id", studentUpdateAboutMe);
 
 //? server listening
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

@@ -13,6 +13,7 @@ const StudentSchema = new mongoose.Schema(
     name: { type: String, required: true },
     subject: { type: String, required: true },
     attendence: { type: [AttendenceSchema], default: [] },
+    aboutMe: { type: String, default: "" },
   },
   { timestamps: true }
 );
