@@ -19,7 +19,7 @@ export const getAllStudents = async () => {
 };
 
 export const getStudentById = async (id) => {
-  const student = await Student.findById(id);
+  const student = await Student.findOne({ _id: id, isActive: true });
   if (!student) return null;
   return {
     ...student.toObject(),
@@ -40,6 +40,7 @@ export const createStudent = async ({ name, subject, email }) => {
         { $eq: [{ $replaceAll: { input: { $toLower: "$subject" }, find: " ", replacement: "" } }, normalizedSubject] },
       ],
     },
+    isActive: true,
   });
   if (existing) {
     return { success: false, message: "Student with same name and subject already exists" };
@@ -62,6 +63,7 @@ export const bulkRegisterStudents = async (students) => {
           { $eq: [{ $replaceAll: { input: { $toLower: "$subject" }, find: " ", replacement: "" } }, normalizedSubject] },
         ],
       },
+      isActive: true,
     });
 
     if (existing) {
@@ -87,7 +89,7 @@ export const deleteStudent = async (id) => {
 };
 
 export const updateStudentAboutMe = async (id, aboutMe) => {
-  const student = await Student.findByIdAndUpdate(id, { aboutMe }, { new: true });
+  const student = await Student.findOneAndUpdate({ _id: id, isActive: true }, { aboutMe }, { new: true });
   if (!student) return null;
   return student;
 };

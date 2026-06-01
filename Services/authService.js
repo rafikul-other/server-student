@@ -77,6 +77,7 @@ export const studentRegister = async ({ name, subject }) => {
         { $eq: [{ $replaceAll: { input: { $toLower: "$subject" }, find: " ", replacement: "" } }, normalizeString(subject)] },
       ],
     },
+    isActive: true,
   });
   if (existingStudent) {
     return { success: false, message: "Student already exists" };

@@ -3,6 +3,10 @@ import { successResponse, errorResponse } from "../utils/responseHelper.js";
 
 export const createDepartmentManager = async (req, res, next) => {
   try {
+    const { name, email, password, department } = req.body;
+    if (!name || !email || !password || !department) {
+      return errorResponse(res, "Name, email, password, and department are required", 400);
+    }
     const result = await departmentManagerService.createDepartmentManager(req.body);
     if (!result.success) return errorResponse(res, result.message, 400);
     return successResponse(res, result.message, result.data, 201);

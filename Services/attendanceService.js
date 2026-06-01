@@ -1,7 +1,7 @@
 import Student from "../models/Student.js";
-import { normalizeString, formatDateShort } from "../utils/dateUtils.js";
-
-const todayDate = formatDateShort();
+import DepartmentManager from "../models/DepartmentManager.js";
+import { ROLES } from "../config/roles.js";
+import { normalizeString } from "../utils/dateUtils.js";
 
 export const markAttendance = async ({ name, subject, date, present }) => {
   const normalizedName = normalizeString(name);
@@ -14,6 +14,7 @@ export const markAttendance = async ({ name, subject, date, present }) => {
         { $eq: [{ $replaceAll: { input: { $toLower: "$subject" }, find: " ", replacement: "" } }, normalizedSubject] },
       ],
     },
+    isActive: true,
   });
 
   if (!student) {
@@ -48,14 +49,43 @@ export const updateAttendance = async (studentId, date, present) => {
 };
 
 export const getStudentAttendance = async (studentId) => {
-  const student = await Student.findById(studentId);
+  const student = await Student.findOne({ _id: studentId, isActive: true });
   if (!student) return null;
   return student.attendance;
 };
 
-export const getAttendanceReport = async (filters = {}) => {
+const getReportQuery = async ({ subject, user }) => {
   const query = { isActive: true };
-  if (filters.subject) query.subject = filters.subject;
+
+  if (subject) {
+    query.subject = subject;
+  }
+
+  if (!user) {
+    return query;
+  }
+
+  if (user.role === ROLES.STUDENT) {
+    query._id = user.id;
+    return query;
+  }
+
+  if (user.role === ROLES.DEPARTMENT_MANAGER) {
+    const manager = await DepartmentManager.findById(user.id).select("department");
+    const managerScope = [{ assignedManager: user.id }];
+
+    if (manager?.department) {
+      managerScope.push({ subject: manager.department });
+    }
+
+    query.$or = managerScope;
+  }
+
+  return query;
+};
+
+export const getAttendanceReport = async (filters = {}) => {
+  const query = await getReportQuery(filters);
 
   const students = await Student.find(query);
   const report = {

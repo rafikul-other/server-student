@@ -22,5 +22,13 @@ DepartmentManagerSchema.methods.comparePassword = async function (candidatePassw
   return bcrypt.compare(candidatePassword, this.password);
 };
 
+const hidePassword = (_doc, ret) => {
+  delete ret.password;
+  return ret;
+};
+
+DepartmentManagerSchema.set("toJSON", { transform: hidePassword });
+DepartmentManagerSchema.set("toObject", { transform: hidePassword });
+
 const DepartmentManager = mongoose.model("DepartmentManager", DepartmentManagerSchema);
 export default DepartmentManager;

@@ -33,3 +33,25 @@ export const isSuperAdmin = hasRole(ROLES.SUPERADMIN);
 export const isAdmin = hasRole(ROLES.SUPERADMIN, ROLES.ADMIN);
 export const isDepartmentManager = hasRole(ROLES.SUPERADMIN, ROLES.ADMIN, ROLES.DEPARTMENT_MANAGER);
 export const isStudent = hasRole(ROLES.STUDENT);
+export const canViewReports = hasRole(ROLES.SUPERADMIN, ROLES.ADMIN, ROLES.DEPARTMENT_MANAGER, ROLES.STUDENT);
+
+export const canAccessStudentRecord = (paramName = "id") => {
+  return (req, res, next) => {
+    const { id, role } = req.user || {};
+    const studentId = req.params[paramName];
+
+    if (!role) {
+      return errorResponse(res, "Access denied. No role found.", 403);
+    }
+
+    if ([ROLES.SUPERADMIN, ROLES.ADMIN, ROLES.DEPARTMENT_MANAGER].includes(role)) {
+      return next();
+    }
+
+    if (role === ROLES.STUDENT && id === studentId) {
+      return next();
+    }
+
+    return errorResponse(res, "Access denied. You can only access your own student record.", 403);
+  };
+};

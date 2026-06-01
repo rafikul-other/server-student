@@ -7,8 +7,8 @@ export const formatDate = () => {
   });
 };
 
-export const normalizeString = (str) =>
-  str.trim().toLowerCase().replace(/\s+/g, "");
+export const normalizeString = (str = "") =>
+  String(str).trim().toLowerCase().replace(/\s+/g, "");
 
 export const formatDateShort = () => {
   const date = new Date();

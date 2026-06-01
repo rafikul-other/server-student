@@ -36,7 +36,7 @@ export const getStudentAttendance = async (req, res, next) => {
 export const getAttendanceReport = async (req, res, next) => {
   try {
     const { subject } = req.query;
-    const report = await attendanceService.getAttendanceReport({ subject });
+    const report = await attendanceService.getAttendanceReport({ subject, user: req.user });
     return successResponse(res, "Attendance report generated", report);
   } catch (error) {
     next(error);

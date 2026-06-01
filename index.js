@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
+import config from "./config/index.js";
 import dbConnection from "./config/dbConnection.js";
 import authRoutes from "./routes/authRoutes.js";
 import studentRoutes from "./routes/studentRoutes.js";
@@ -14,7 +15,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(express.json());
-app.use(cors("*"));
+app.use(cors({ origin: config.cors.origin }));
 
 app.get("/", (req, res) => {
   res.status(200).json({ message: "GD College API is running!", version: "2.0" });
