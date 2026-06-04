@@ -17,6 +17,11 @@ export const createDepartmentManager = async (req, res, next) => {
 
 export const getAllDepartmentManagers = async (req, res, next) => {
   try {
+    if (req.user.role === "DepartmentManager") {
+      const manager = await departmentManagerService.getDepartmentManagerById(req.user.id);
+      if (!manager) return errorResponse(res, "Department manager not found", 404);
+      return successResponse(res, "Department manager fetched", { managers: [manager], total: 1 });
+    }
     const managers = await departmentManagerService.getAllDepartmentManagers();
     return successResponse(res, "Department managers fetched", { managers, total: managers.length });
   } catch (error) {
