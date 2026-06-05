@@ -14,7 +14,7 @@ const config = {
     password: process.env.ADMIN_PASSWORD,
   },
   cors: {
-    origin: process.env.CORS_ORIGIN || "*",
+    origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(",") : "*",
   },
   dailyEntryLimit: parseInt(process.env.DAILY_ENTRY_LIMIT) || 100,
 };
