@@ -1,5 +1,6 @@
 import * as studentService from "../Services/studentService.js";
 import { successResponse, errorResponse } from "../utils/responseHelper.js";
+import { checkDailyLimit } from "../utils/dailyEntryCheck.js";
 
 export const getAllStudents = async (req, res, next) => {
   try {
@@ -22,6 +23,14 @@ export const getStudentById = async (req, res, next) => {
 
 export const createStudent = async (req, res, next) => {
   try {
+    const limitCheck = await checkDailyLimit();
+    if (!limitCheck.allowed) {
+      return errorResponse(
+        res,
+        `Daily entry limit reached (${limitCheck.count}/${limitCheck.limit}). Please try again tomorrow.`,
+        429
+      );
+    }
     const result = await studentService.createStudent(req.body);
     if (!result.success) return errorResponse(res, result.message, 400);
     return successResponse(res, result.message, result.data, 201);

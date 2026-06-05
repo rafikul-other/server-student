@@ -16,6 +16,7 @@ const config = {
   cors: {
     origin: process.env.CORS_ORIGIN || "*",
   },
+  dailyEntryLimit: parseInt(process.env.DAILY_ENTRY_LIMIT) || 100,
 };
 
 export default config;

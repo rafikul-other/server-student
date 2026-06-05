@@ -54,6 +54,43 @@ export const getStudentAttendance = async (studentId) => {
   return student.attendance;
 };
 
+export const selfMarkAttendance = async (studentId, present) => {
+  const today = new Date().toISOString().split("T")[0];
+  const student = await Student.findOne({ _id: studentId, isActive: true });
+  if (!student) return { success: false, message: "Student not found" };
+
+  const exists = student.attendance.some((a) => a.date === today);
+  if (exists) {
+    return { success: false, message: "Attendance already recorded for today" };
+  }
+
+  const updated = await Student.findByIdAndUpdate(
+    student._id,
+    { $push: { attendance: { date: today, present } } },
+    { new: true }
+  );
+
+  return { success: true, message: "Attendance marked successfully", data: updated };
+};
+
+export const markAttendanceById = async (studentId, date, present) => {
+  const student = await Student.findOne({ _id: studentId, isActive: true });
+  if (!student) return { success: false, message: "Student not found" };
+
+  const exists = student.attendance.some((a) => a.date === date);
+  if (exists) {
+    return { success: false, message: "Attendance already recorded for this date" };
+  }
+
+  const updated = await Student.findByIdAndUpdate(
+    student._id,
+    { $push: { attendance: { date, present } } },
+    { new: true }
+  );
+
+  return { success: true, message: "Attendance marked successfully", data: updated };
+};
+
 const getReportQuery = async ({ subject, user }) => {
   const query = { isActive: true };
 

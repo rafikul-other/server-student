@@ -1,8 +1,17 @@
 import * as departmentManagerService from "../Services/departmentManagerService.js";
 import { successResponse, errorResponse } from "../utils/responseHelper.js";
+import { checkDailyLimit } from "../utils/dailyEntryCheck.js";
 
 export const createDepartmentManager = async (req, res, next) => {
   try {
+    const limitCheck = await checkDailyLimit();
+    if (!limitCheck.allowed) {
+      return errorResponse(
+        res,
+        `Daily entry limit reached (${limitCheck.count}/${limitCheck.limit}). Please try again tomorrow.`,
+        429
+      );
+    }
     const { name, email, password, department } = req.body;
     if (!name || !email || !password || !department) {
       return errorResponse(res, "Name, email, password, and department are required", 400);

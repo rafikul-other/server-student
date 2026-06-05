@@ -33,7 +33,7 @@ export const isSuperAdmin = hasRole(ROLES.SUPERADMIN);
 export const isAdmin = hasRole(ROLES.SUPERADMIN, ROLES.ADMIN);
 export const isDepartmentManager = hasRole(ROLES.SUPERADMIN, ROLES.ADMIN, ROLES.DEPARTMENT_MANAGER);
 export const isStudent = hasRole(ROLES.STUDENT);
-export const canViewReports = hasRole(ROLES.SUPERADMIN, ROLES.ADMIN, ROLES.DEPARTMENT_MANAGER, ROLES.STUDENT);
+export const canViewReports = hasRole(ROLES.SUPERADMIN, ROLES.ADMIN, ROLES.DEPARTMENT_MANAGER);
 
 export const canAccessStudentRecord = (paramName = "id") => {
   return (req, res, next) => {

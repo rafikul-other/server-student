@@ -42,3 +42,25 @@ export const getAttendanceReport = async (req, res, next) => {
     next(error);
   }
 };
+
+export const selfMarkAttendance = async (req, res, next) => {
+  try {
+    const { present } = req.body;
+    const result = await attendanceService.selfMarkAttendance(req.user.id, present);
+    if (!result.success) return errorResponse(res, result.message, 400);
+    return successResponse(res, result.message, result.data);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const markAttendanceById = async (req, res, next) => {
+  try {
+    const { date, present } = req.body;
+    const result = await attendanceService.markAttendanceById(req.params.studentId, date, present);
+    if (!result.success) return errorResponse(res, result.message, 400);
+    return successResponse(res, result.message, result.data);
+  } catch (error) {
+    next(error);
+  }
+};

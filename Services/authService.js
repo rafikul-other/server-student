@@ -16,11 +16,27 @@ export const superAdminLogin = async ({ id, password }) => {
 };
 
 export const adminLogin = async ({ id, password }) => {
-  if (id !== config.admin.id || password !== config.admin.password) {
+  if (id === config.admin.id && password === config.admin.password) {
+    const token = createToken({ id: config.admin.id, role: "Admin" });
+    return { success: true, message: "Admin Login Successful", role: "Admin", token };
+  }
+
+  const Admin = (await import("../models/Admin.js")).default;
+  const admin = await Admin.findOne({ email: id.toLowerCase() }).select("+password");
+  if (!admin || !admin.isActive) {
     return { success: false, message: "Invalid admin credentials" };
   }
-  const token = createToken({ id: config.admin.id, role: "Admin" });
-  return { success: true, message: "Admin Login Successful", role: "Admin", token };
+  const isMatch = await admin.comparePassword(password);
+  if (!isMatch) {
+    return { success: false, message: "Invalid admin credentials" };
+  }
+  const token = createToken({ id: admin._id.toString(), role: "Admin" });
+  return {
+    success: true,
+    message: "Admin Login Successful",
+    data: { _id: admin._id, name: admin.name, email: admin.email, role: "Admin" },
+    token,
+  };
 };
 
 export const departmentManagerLogin = async ({ email, password }) => {

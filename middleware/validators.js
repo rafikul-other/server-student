@@ -52,3 +52,29 @@ export const validateAttendance = (req, res, next) => {
   }
   next();
 };
+
+export const validateSelfAttendance = (req, res, next) => {
+  const { present } = req.body;
+  if (!present) {
+    return res.status(400).json({ message: "present is required", success: false });
+  }
+  if (!["Present", "Absent"].includes(present)) {
+    return res.status(400).json({ message: "present must be 'Present' or 'Absent'", success: false });
+  }
+  const today = new Date().toISOString().split("T")[0];
+  if (req.body.date && req.body.date !== today) {
+    return res.status(400).json({ message: "Students can only mark attendance for today", success: false });
+  }
+  next();
+};
+
+export const validateMarkById = (req, res, next) => {
+  const { date, present } = req.body;
+  if (!date || !present) {
+    return res.status(400).json({ message: "date and present are required", success: false });
+  }
+  if (!["Present", "Absent"].includes(present)) {
+    return res.status(400).json({ message: "present must be 'Present' or 'Absent'", success: false });
+  }
+  next();
+};
