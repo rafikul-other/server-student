@@ -4,7 +4,7 @@ import { ROLES } from "../config/roles.js";
 
 export const createMessage = async (req, res, next) => {
   try {
-    const { subject, message } = req.body;
+    const { subject, message, studentName } = req.body;
     if (!subject || !message) {
       return errorResponse(res, "Subject and message are required", 400);
     }
@@ -12,6 +12,7 @@ export const createMessage = async (req, res, next) => {
       fromManager: req.user.id,
       subject,
       message,
+      studentName,
     });
     if (!result.success) return errorResponse(res, result.message, 400);
     return successResponse(res, result.message, result.data, 201);

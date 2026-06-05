@@ -8,6 +8,7 @@ const MessageSchema = new mongoose.Schema(
     toAdmin: { type: mongoose.Schema.Types.ObjectId, ref: "Admin", required: true },
     toName: { type: String, required: true },
     subject: { type: String, required: true },
+    studentName: { type: String, default: "" },
     message: { type: String, required: true },
     status: { type: String, enum: ["pending", "processing", "done", "rejected"], default: "pending" },
     resolution: { type: String, default: "" },

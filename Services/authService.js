@@ -22,7 +22,7 @@ export const adminLogin = async ({ id, password }) => {
   }
 
   const Admin = (await import("../models/Admin.js")).default;
-  const admin = await Admin.findOne({ email: id.toLowerCase() }).select("+password");
+  const admin = await Admin.findOne({ $or: [{ adminId: id }, { email: id.toLowerCase() }] }).select("+password");
   if (!admin || !admin.isActive) {
     return { success: false, message: "Invalid admin credentials" };
   }

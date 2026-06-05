@@ -1,12 +1,17 @@
 import Admin from "../models/Admin.js";
 
-export const createAdmin = async ({ name, email, password, assignedManager }) => {
-  const normalizedEmail = email.trim().toLowerCase();
-  const existing = await Admin.findOne({ email: normalizedEmail });
-  if (existing) {
-    return { success: false, message: "Admin with this email already exists" };
+export const createAdmin = async ({ name, email, password, adminId, assignedManager }) => {
+  if (!adminId) {
+    return { success: false, message: "Admin ID is required" };
   }
-  const admin = new Admin({ name, email: normalizedEmail, password, assignedManager });
+  const normalizedAdminId = adminId.trim();
+  const existing = await Admin.findOne({ adminId: normalizedAdminId });
+  if (existing) {
+    return { success: false, message: "Admin ID already exists" };
+  }
+  const adminData = { name, password, adminId: normalizedAdminId, assignedManager };
+  if (email) adminData.email = email.trim().toLowerCase();
+  const admin = new Admin(adminData);
   await admin.save();
   return { success: true, message: "Admin created", data: admin.toObject() };
 };
@@ -24,8 +29,18 @@ export const updateAdmin = async (id, updates) => {
   if (!admin) return null;
 
   const safeUpdates = { ...updates };
+  if (safeUpdates.email === "") {
+    delete safeUpdates.email;
+  }
   if (safeUpdates.email) {
     safeUpdates.email = safeUpdates.email.trim().toLowerCase();
+  }
+  if (safeUpdates.adminId) {
+    safeUpdates.adminId = safeUpdates.adminId.trim();
+    const existing = await Admin.findOne({ adminId: safeUpdates.adminId, _id: { $ne: id } });
+    if (existing) {
+      return { success: false, message: "Admin ID already taken" };
+    }
   }
 
   Object.assign(admin, safeUpdates);

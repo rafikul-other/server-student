@@ -3,9 +3,9 @@ import { successResponse, errorResponse } from "../utils/responseHelper.js";
 
 export const createAdmin = async (req, res, next) => {
   try {
-    const { name, email, password, assignedManager } = req.body;
-    if (!name || !email || !password) {
-      return errorResponse(res, "Name, email, and password are required", 400);
+    const { name, email, password, adminId, assignedManager } = req.body;
+    if (!name || !password || !adminId) {
+      return errorResponse(res, "Name, Admin ID, and password are required", 400);
     }
     const result = await adminService.createAdmin(req.body);
     if (!result.success) return errorResponse(res, result.message, 400);

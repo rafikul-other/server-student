@@ -2,7 +2,7 @@ import Message from "../models/Message.js";
 import Admin from "../models/Admin.js";
 import DepartmentManager from "../models/DepartmentManager.js";
 
-export const createMessage = async ({ fromManager, subject, message }) => {
+export const createMessage = async ({ fromManager, subject, message, studentName }) => {
   const manager = await DepartmentManager.findById(fromManager);
   if (!manager) {
     return { success: false, message: "Manager not found" };
@@ -20,6 +20,7 @@ export const createMessage = async ({ fromManager, subject, message }) => {
     toAdmin: admin._id,
     toName: admin.name,
     subject,
+    studentName: studentName || "",
     message,
   });
 
