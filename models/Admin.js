@@ -4,11 +4,11 @@ import bcrypt from "bcryptjs";
 const AdminSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
-    email: { type: String, unique: true, sparse: true },
-    adminId: { type: String, required: true, unique: true },
+    email: { type: String, sparse: true },
+    adminId: { type: String, required: true },
     password: { type: String, required: true, select: false },
     isActive: { type: Boolean, default: true },
-    assignedManager: { type: mongoose.Schema.Types.ObjectId, ref: "DepartmentManager", default: null },
+    assignedManagers: [{ type: mongoose.Schema.Types.ObjectId, ref: "DepartmentManager", default: [] }],
   },
   { timestamps: true }
 );

@@ -50,9 +50,10 @@ export const getDepartmentManagerById = async (req, res, next) => {
 
 export const updateDepartmentManager = async (req, res, next) => {
   try {
-    const manager = await departmentManagerService.updateDepartmentManager(req.params.id, req.body);
-    if (!manager) return errorResponse(res, "Department manager not found", 404);
-    return successResponse(res, "Department manager updated", manager);
+    const result = await departmentManagerService.updateDepartmentManager(req.params.id, req.body);
+    if (!result) return errorResponse(res, "Department manager not found", 404);
+    if (result.success === false) return errorResponse(res, result.message, 400);
+    return successResponse(res, "Department manager updated", result);
   } catch (error) {
     next(error);
   }

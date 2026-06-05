@@ -2,7 +2,7 @@ import DepartmentManager from "../models/DepartmentManager.js";
 
 export const createDepartmentManager = async ({ name, email, password, department }) => {
   const normalizedEmail = email.trim().toLowerCase();
-  const existing = await DepartmentManager.findOne({ email: normalizedEmail });
+  const existing = await DepartmentManager.findOne({ email: normalizedEmail, isActive: true });
   if (existing) {
     return { success: false, message: "Department manager with this email already exists" };
   }
@@ -26,6 +26,10 @@ export const updateDepartmentManager = async (id, updates) => {
   const safeUpdates = { ...updates };
   if (safeUpdates.email) {
     safeUpdates.email = safeUpdates.email.trim().toLowerCase();
+    const existing = await DepartmentManager.findOne({ email: safeUpdates.email, _id: { $ne: id }, isActive: true });
+    if (existing) {
+      return { success: false, message: "Email already taken by another department manager" };
+    }
   }
 
   Object.assign(manager, safeUpdates);

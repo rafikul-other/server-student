@@ -3,7 +3,7 @@ import { successResponse, errorResponse } from "../utils/responseHelper.js";
 
 export const createAdmin = async (req, res, next) => {
   try {
-    const { name, email, password, adminId, assignedManager } = req.body;
+    const { name, email, password, adminId, assignedManagers } = req.body;
     if (!name || !password || !adminId) {
       return errorResponse(res, "Name, Admin ID, and password are required", 400);
     }
@@ -36,9 +36,10 @@ export const getAdminById = async (req, res, next) => {
 
 export const updateAdmin = async (req, res, next) => {
   try {
-    const admin = await adminService.updateAdmin(req.params.id, req.body);
-    if (!admin) return errorResponse(res, "Admin not found", 404);
-    return successResponse(res, "Admin updated", admin);
+    const result = await adminService.updateAdmin(req.params.id, req.body);
+    if (!result) return errorResponse(res, "Admin not found", 404);
+    if (result.success === false) return errorResponse(res, result.message, 400);
+    return successResponse(res, "Admin updated", result);
   } catch (error) {
     next(error);
   }

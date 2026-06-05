@@ -8,7 +8,7 @@ export const createMessage = async ({ fromManager, subject, message, studentName
     return { success: false, message: "Manager not found" };
   }
 
-  const admin = await Admin.findOne({ assignedManager: fromManager });
+  const admin = await Admin.findOne({ assignedManagers: fromManager, isActive: true });
   if (!admin) {
     return { success: false, message: "No admin assigned to this manager yet" };
   }
@@ -28,11 +28,19 @@ export const createMessage = async ({ fromManager, subject, message, studentName
   return { success: true, message: "Message sent", data: msg.toObject() };
 };
 
+const isValidObjectId = (id) => /^[0-9a-fA-F]{24}$/.test(id);
+
 export const getMessagesForManager = async (managerId) => {
+  if (!isValidObjectId(managerId)) return [];
   return Message.find({ fromManager: managerId }).sort({ createdAt: -1 });
 };
 
 export const getMessagesForAdmin = async (adminId) => {
+  if (!isValidObjectId(adminId)) {
+    const admin = await Admin.findOne({ adminId });
+    if (!admin) return [];
+    return Message.find({ toAdmin: admin._id }).sort({ createdAt: -1 });
+  }
   return Message.find({ toAdmin: adminId }).sort({ createdAt: -1 });
 };
 
