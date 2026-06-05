@@ -1,5 +1,7 @@
 import Student from "../models/Student.js";
 import DepartmentManager from "../models/DepartmentManager.js";
+import Admin from "../models/Admin.js";
+import Message from "../models/Message.js";
 import config from "../config/index.js";
 
 export const getTodayStartEnd = () => {
@@ -17,15 +19,14 @@ export const getTodayStartEnd = () => {
 export const checkDailyLimit = async () => {
   const { start, end } = getTodayStartEnd();
 
-  const studentCount = await Student.countDocuments({
-    createdAt: { $gte: start, $lt: end },
-  });
+  const [studentCount, managerCount, adminCount, messageCount] = await Promise.all([
+    Student.countDocuments({ createdAt: { $gte: start, $lt: end } }),
+    DepartmentManager.countDocuments({ createdAt: { $gte: start, $lt: end } }),
+    Admin.countDocuments({ createdAt: { $gte: start, $lt: end } }),
+    Message.countDocuments({ createdAt: { $gte: start, $lt: end } }),
+  ]);
 
-  const managerCount = await DepartmentManager.countDocuments({
-    createdAt: { $gte: start, $lt: end },
-  });
-
-  const total = studentCount + managerCount;
+  const total = studentCount + managerCount + adminCount + messageCount;
   const limit = config.dailyEntryLimit;
   const allowed = total < limit;
 

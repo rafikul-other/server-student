@@ -1,9 +1,18 @@
 import * as messageService from "../Services/messageService.js";
 import { successResponse, errorResponse } from "../utils/responseHelper.js";
 import { ROLES } from "../config/roles.js";
+import { checkDailyLimit } from "../utils/dailyEntryCheck.js";
 
 export const createMessage = async (req, res, next) => {
   try {
+    const limitCheck = await checkDailyLimit();
+    if (!limitCheck.allowed) {
+      return errorResponse(
+        res,
+        `Daily entry limit reached (${limitCheck.count}/${limitCheck.limit}). Please try again tomorrow.`,
+        429
+      );
+    }
     const { subject, message, studentName } = req.body;
     if (!subject || !message) {
       return errorResponse(res, "Subject and message are required", 400);
