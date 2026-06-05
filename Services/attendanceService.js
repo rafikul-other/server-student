@@ -124,7 +124,7 @@ const getReportQuery = async ({ subject, user }) => {
 export const getAttendanceReport = async (filters = {}) => {
   const query = await getReportQuery(filters);
 
-  const students = await Student.find(query);
+  const students = await Student.find(query).lean();
   const report = {
     totalStudents: students.length,
     totalPresent: 0,
