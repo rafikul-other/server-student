@@ -3,7 +3,7 @@ import { successResponse, errorResponse } from "../utils/responseHelper.js";
 
 export const createAdmin = async (req, res, next) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, assignedManager } = req.body;
     if (!name || !email || !password) {
       return errorResponse(res, "Name, email, and password are required", 400);
     }

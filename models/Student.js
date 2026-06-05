@@ -4,6 +4,7 @@ const AttendanceSchema = new mongoose.Schema(
   {
     date: { type: String, required: true },
     present: { type: String, enum: ["Present", "Absent"], required: true },
+    markedBy: { type: String, enum: ["self", "admin", "manager"], default: "admin" },
   },
   { timestamps: true }
 );

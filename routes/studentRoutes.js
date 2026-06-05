@@ -11,7 +11,7 @@ router.get("/:id", authenticateToken, canAccessStudentRecord("id"), getStudentBy
 router.post("/", authenticateToken, isDepartmentManager, validateStudent, createStudent);
 router.post("/bulk", authenticateToken, isDepartmentManager, validateBulkStudents, bulkRegisterStudents);
 router.put("/:id/about-me", authenticateToken, canAccessStudentRecord("id"), updateStudentAboutMe);
-router.put("/:id", authenticateToken, isDepartmentManager, updateStudent);
-router.delete("/:id", authenticateToken, isDepartmentManager, deleteStudent);
+router.put("/:id", authenticateToken, isAdmin, updateStudent);
+router.delete("/:id", authenticateToken, isAdmin, deleteStudent);
 
 export default router;

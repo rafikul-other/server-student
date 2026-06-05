@@ -8,6 +8,7 @@ import studentRoutes from "./routes/studentRoutes.js";
 import attendanceRoutes from "./routes/attendanceRoutes.js";
 import departmentManagerRoutes from "./routes/departmentManagerRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import messageRoutes from "./routes/messageRoutes.js";
 import { errorHandler, notFoundHandler } from "./middleware/errorHandler.js";
 
 dotenv.config();
@@ -27,6 +28,7 @@ app.use("/api/v1/students", studentRoutes);
 app.use("/api/v1/attendance", attendanceRoutes);
 app.use("/api/v1/department-managers", departmentManagerRoutes);
 app.use("/api/v1/admins", adminRoutes);
+app.use("/api/v1/messages", messageRoutes);
 
 app.use(notFoundHandler);
 app.use(errorHandler);

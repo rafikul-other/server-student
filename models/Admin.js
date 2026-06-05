@@ -7,6 +7,7 @@ const AdminSchema = new mongoose.Schema(
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true, select: false },
     isActive: { type: Boolean, default: true },
+    assignedManager: { type: mongoose.Schema.Types.ObjectId, ref: "DepartmentManager", default: null },
   },
   { timestamps: true }
 );

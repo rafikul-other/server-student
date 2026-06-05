@@ -3,7 +3,7 @@ import DepartmentManager from "../models/DepartmentManager.js";
 import { ROLES } from "../config/roles.js";
 import { normalizeString } from "../utils/dateUtils.js";
 
-export const markAttendance = async ({ name, subject, date, present }) => {
+export const markAttendance = async ({ name, subject, date, present, markedBy = "admin" }) => {
   const normalizedName = normalizeString(name);
   const normalizedSubject = normalizeString(subject);
 
@@ -28,14 +28,14 @@ export const markAttendance = async ({ name, subject, date, present }) => {
 
   const updated = await Student.findByIdAndUpdate(
     student._id,
-    { $push: { attendance: { date, present } } },
+    { $push: { attendance: { date, present, markedBy } } },
     { new: true }
   );
 
   return { success: true, message: "Attendance marked successfully", data: updated };
 };
 
-export const updateAttendance = async (studentId, date, present) => {
+export const updateAttendance = async (studentId, date, present, markedBy = "admin") => {
   const student = await Student.findById(studentId);
   if (!student) return { success: false, message: "Student not found" };
 
@@ -43,6 +43,7 @@ export const updateAttendance = async (studentId, date, present) => {
   if (idx === -1) return { success: false, message: "Attendance record not found" };
 
   student.attendance[idx].present = present;
+  if (markedBy) student.attendance[idx].markedBy = markedBy;
   await student.save();
 
   return { success: true, message: "Attendance updated", data: student };
@@ -66,14 +67,14 @@ export const selfMarkAttendance = async (studentId, present) => {
 
   const updated = await Student.findByIdAndUpdate(
     student._id,
-    { $push: { attendance: { date: today, present } } },
+    { $push: { attendance: { date: today, present, markedBy: "self" } } },
     { new: true }
   );
 
   return { success: true, message: "Attendance marked successfully", data: updated };
 };
 
-export const markAttendanceById = async (studentId, date, present) => {
+export const markAttendanceById = async (studentId, date, present, markedBy = "admin") => {
   const student = await Student.findOne({ _id: studentId, isActive: true });
   if (!student) return { success: false, message: "Student not found" };
 
@@ -84,7 +85,7 @@ export const markAttendanceById = async (studentId, date, present) => {
 
   const updated = await Student.findByIdAndUpdate(
     student._id,
-    { $push: { attendance: { date, present } } },
+    { $push: { attendance: { date, present, markedBy } } },
     { new: true }
   );
 
@@ -122,7 +123,8 @@ const getReportQuery = async ({ subject, user }) => {
 };
 
 export const getAttendanceReport = async (filters = {}) => {
-  const query = await getReportQuery(filters);
+  const { subject, month, year, user } = filters;
+  const query = await getReportQuery({ subject, user });
 
   const students = await Student.find(query).lean();
   const report = {
@@ -134,21 +136,30 @@ export const getAttendanceReport = async (filters = {}) => {
     recentRecords: [],
   };
 
+  const filterByMonth = (attendance) => {
+    if (!month || !year) return attendance;
+    return attendance.filter((a) => {
+      const [y, m] = a.date.split("-");
+      return y === year && m === month.padStart(2, "0");
+    });
+  };
+
   students.forEach((student) => {
-    const present = student.attendance.filter((a) => a.present === "Present").length;
-    const absent = student.attendance.filter((a) => a.present === "Absent").length;
+    const monthAttendance = filterByMonth(student.attendance);
+    const present = monthAttendance.filter((a) => a.present === "Present").length;
+    const absent = monthAttendance.filter((a) => a.present === "Absent").length;
     report.totalPresent += present;
     report.totalAbsent += absent;
 
     if (!report.bySubject[student.subject]) {
       report.bySubject[student.subject] = { total: 0, present: 0, absent: 0, students: 0 };
     }
-    report.bySubject[student.subject].total += student.attendance.length;
+    report.bySubject[student.subject].total += monthAttendance.length;
     report.bySubject[student.subject].present += present;
     report.bySubject[student.subject].absent += absent;
     report.bySubject[student.subject].students += 1;
 
-    student.attendance.slice(-5).forEach((a) => {
+    monthAttendance.slice(-5).forEach((a) => {
       report.recentRecords.push({ student: student.name, subject: student.subject, ...a });
     });
   });
