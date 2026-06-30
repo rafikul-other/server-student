@@ -94,7 +94,7 @@ const reverseGeocode = async (lat, lon) => {
   }
 };
 
-export const createLog = async ({ userId, userType, userName, email = "", ip = "", userAgent = "", latitude, longitude }) => {
+export const createLog = async ({ userId, userType, userName, email = "", ip = "", userAgent = "", latitude, longitude, city, region, country }) => {
   try {
     const resolvedIp = isLoopback(ip) ? getSystemIp() : ip;
     const location = await fetchGeoFromIp(resolvedIp);
@@ -107,13 +107,24 @@ export const createLog = async ({ userId, userType, userName, email = "", ip = "
     if (hasBrowserCoords) {
       location.lat = latitude;
       location.lon = longitude;
-      if (!location.city || location.city === "Private Network") {
-        const reverse = await reverseGeocode(latitude, longitude);
-        if (reverse) {
-          location.city = reverse.city || location.city;
-          location.region = reverse.region || location.region;
-          location.country = reverse.country || location.country;
-        }
+    }
+
+    if (typeof city === "string" && city.trim()) {
+      location.city = city.trim();
+    }
+    if (typeof region === "string" && region.trim()) {
+      location.region = region.trim();
+    }
+    if (typeof country === "string" && country.trim()) {
+      location.country = country.trim();
+    }
+
+    if (hasBrowserCoords && (!location.city || location.city === "Private Network")) {
+      const reverse = await reverseGeocode(latitude, longitude);
+      if (reverse) {
+        location.city = reverse.city || location.city;
+        location.region = reverse.region || location.region;
+        location.country = reverse.country || location.country;
       }
     }
 

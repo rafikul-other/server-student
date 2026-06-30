@@ -31,6 +31,9 @@ export const superAdminLogin = async (req, res, next) => {
       userAgent: meta.userAgent,
       latitude: req.body?.latitude,
       longitude: req.body?.longitude,
+      city: req.body?.city,
+      region: req.body?.region,
+      country: req.body?.country,
     });
 
     return successResponse(res, result.message, { role: result.role }, 200, result.token);
@@ -58,6 +61,9 @@ export const adminLogin = async (req, res, next) => {
       userAgent: meta.userAgent,
       latitude: req.body?.latitude,
       longitude: req.body?.longitude,
+      city: req.body?.city,
+      region: req.body?.region,
+      country: req.body?.country,
     });
 
     return successResponse(res, result.message, { role: result.role }, 200, result.token);
@@ -85,6 +91,9 @@ export const departmentManagerLogin = async (req, res, next) => {
       userAgent: meta.userAgent,
       latitude: req.body?.latitude,
       longitude: req.body?.longitude,
+      city: req.body?.city,
+      region: req.body?.region,
+      country: req.body?.country,
     });
 
     return successResponse(res, result.message, result.data, 200, result.token);
@@ -112,6 +121,9 @@ export const studentLogin = async (req, res, next) => {
       userAgent: meta.userAgent,
       latitude: req.body?.latitude,
       longitude: req.body?.longitude,
+      city: req.body?.city,
+      region: req.body?.region,
+      country: req.body?.country,
     });
 
     return successResponse(res, result.message, result.data, 200, result.token);
