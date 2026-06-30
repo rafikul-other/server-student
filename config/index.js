@@ -14,7 +14,7 @@ const config = {
     password: process.env.ADMIN_PASSWORD,
   },
   cors: {
-    origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(",") : "*",
+    origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(",") : "https://gdcollegerafi.vercel.app",
   },
   dailyEntryLimit: parseInt(process.env.DAILY_ENTRY_LIMIT) || 100,
 };
